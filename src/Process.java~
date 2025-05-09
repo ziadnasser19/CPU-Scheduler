@@ -1,0 +1,99 @@
+public class Process {
+
+    enum ProcessState {
+        NEW,
+        READY,
+        RUNNING,
+        WAITING,
+        TERMINATED
+    }
+    private static int PID = 0;
+    private final String processNumber = 'P'+ String.valueOf(PID);
+    private final int burstTime;
+    private int remainingTime;
+    private int priority;
+    private final int arrivalTime;
+    private int waitingTime;
+    private int turnAroundTime;
+    private int responseTime;
+    private int startTime;
+
+    public int getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(int startTime) {
+        this.startTime = startTime;
+    }
+
+    public int getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(int endTime) {
+        this.endTime = endTime;
+    }
+
+    private int endTime;
+
+
+    public Process(int PID,int burstTime, int priority, int arrivalTime) {
+        this.burstTime = burstTime;
+        this.priority = priority;
+        this.arrivalTime = arrivalTime;
+        this.remainingTime = burstTime;
+        this.PID = PID;
+    }
+
+    public String getProcessNumber() {
+        return processNumber;
+    }
+
+    public int getBurstTime() {
+        return burstTime;
+    }
+
+    public int getRemainingTime() {
+        return remainingTime;
+    }
+
+    public void setRemainingTime(int remainingTime) {
+        this.remainingTime = remainingTime;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public int getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public int getWaitingTime() {
+        return waitingTime;
+    }
+
+    public void setWaitingTime(int waitingTime) {
+        this.waitingTime = waitingTime;
+    }
+
+    public int getTurnAroundTime() {
+        return turnAroundTime;
+    }
+
+    public void setTurnAroundTime(int turnAroundTime) {
+        this.turnAroundTime = turnAroundTime;
+    }
+
+    public int getResponseTime() {
+        return responseTime;
+    }
+
+    public void setResponseTime(int responseTime) {
+        this.responseTime = responseTime;
+    }
+}

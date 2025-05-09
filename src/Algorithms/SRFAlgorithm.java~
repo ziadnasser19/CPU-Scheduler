@@ -1,0 +1,52 @@
+package Algorithms;
+
+import Models.Process;
+import Models.ProcessManager;
+
+import java.util.*;
+
+public class SRFAlgorithm {
+
+    ProcessManager processManager;
+
+    public SRFAlgorithm(ProcessManager processManager) {
+        this.processManager = processManager;
+    }
+
+    public void schedule() {
+        List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
+        Queue<Process> availableProcess = new PriorityQueue<>(Comparator.comparingInt(Process::getRemainingTime));
+        
+
+        Collections.sort(processes, Comparator.comparingInt(Process::getArrivalTime));
+
+        int currentTime = 0;
+        int i = 0;
+        int finishedCount = 0;
+        int total = processes.size();
+        while (finishedCount < total) {
+            while (i < processes.size() && processes.get(i).getArrivalTime() <= currentTime) {
+                availableProcess.add(processes.get(i));
+                i++;
+            }
+
+            if (availableProcess.isEmpty()) {
+                currentTime++;
+                continue;
+            }
+
+            Process process = availableProcess.poll();
+
+            process.setStartTime(currentTime);
+            currentTime += process.getBurstTime();
+            process.setResponseTime(process.getStartTime() - process.getArrivalTime());
+            process.setRemainingTime(0);
+            process.setEndTime(currentTime);
+            process.setTurnAroundTime(process.getEndTime() - process.getArrivalTime());
+            process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
+            finishedCount++;
+            processManager.removeProcess(process);
+            processManager.addFinishedProcess(process);
+        }
+    }
+}

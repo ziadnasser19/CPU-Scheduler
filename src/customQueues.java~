@@ -1,0 +1,15 @@
+import java.util.*;
+import Models.ProcessManager;
+
+public class customQueues {
+    Queue<Process> readyqueue;
+    Queue<Process> burstTimeQueue;
+
+    public customQueues(Queue<Process> readyqueue){
+        this.readyqueue = readyqueue;
+        f
+    }
+    public Queue<Process> getBurstTimeQueue() {
+        return burstTimeQueue;
+    }
+}
