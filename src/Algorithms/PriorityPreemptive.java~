@@ -5,53 +5,51 @@ import Models.ProcessManager;
 
 import java.util.*;
 
-public class PriorityPreemptive implements SchedulingAlgorithm{
+public class PriorityPreemptive implements SchedulingAlgorithm {
+    private final ProcessManager manager;
 
-    ProcessManager processManager;
-
-    public PriorityPreemptive(ProcessManager processManager) {
-        this.processManager = processManager;
+    public PriorityPreemptive(ProcessManager manager) {
+        this.manager = manager;
     }
 
+    @Override
     public void schedule() {
-        List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
-        Queue<Process> availableProcess = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
+        List<Process> processes = new ArrayList<>(manager.getReadyQueue());
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
 
-        Collections.sort(processes, Comparator.comparingInt(Process::getArrivalTime));
+        manager.resetFinished();
 
-        int currentTime = 0;
-        int i = 0;
-        int finishedCount = 0;
-        int total = processManager.getReadyQueue().size();
-        while (finishedCount < total) {
+        PriorityQueue<Process> pq = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
+        int currentTime = 0, i = 0, total = processes.size(), finished = 0;
+
+        while (finished < total) {
             while (i < processes.size() && processes.get(i).getArrivalTime() <= currentTime) {
-                availableProcess.add(processes.get(i));
+                pq.add(processes.get(i));
                 i++;
             }
 
-            if (availableProcess.isEmpty()) {
+            if (pq.isEmpty()) {
                 currentTime++;
                 continue;
             }
 
-            Process process = availableProcess.poll();
-            if (process.getRemainingTime() == process.getBurstTime()) {
-                process.setStartTime(currentTime);
-                process.setResponseTime(process.getStartTime() - process.getArrivalTime());
+            Process p = pq.poll();
+            if (p.getRemainingTime() == p.getBurstTime()) {
+                p.setStartTime(currentTime);
+                p.setResponseTime(currentTime - p.getArrivalTime());
             }
 
-            process.setRemainingTime(process.getRemainingTime() - 1);
+            p.setRemainingTime(p.getRemainingTime() - 1);
             currentTime++;
 
-            if (process.getRemainingTime() == 0) {
-                process.setEndTime(currentTime);
-                process.setTurnAroundTime(process.getEndTime() - process.getArrivalTime());
-                process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
-                finishedCount++;
-                processManager.removeProcess(process);
-                processManager.addFinishedProcess(process);
+            if (p.getRemainingTime() == 0) {
+                p.setEndTime(currentTime);
+                p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
+                p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+                manager.addFinishedProcess(p);
+                finished++;
             } else {
-                availableProcess.add(process);
+                pq.add(p);
             }
         }
     }

@@ -1,73 +1,94 @@
 package GUI;
 
-import Algorithms.RoundRobin;
-import Models.Process;
-
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Queue;
 
 public class GanttChartPanel extends JPanel {
-    private List<RoundRobin.ExecutionSegment> segments;
+    private List<ExecutionSegment> timeline = new ArrayList<>();
+
+    private final int timeUnitWidth = 40;
+    private final int rowHeight      = 30;
+    private final int padding        = 50;
 
     public GanttChartPanel() {
-        setBorder(BorderFactory.createTitledBorder("Gantt Chart"));
-        setPreferredSize(new Dimension(1100, 220));
+        setPreferredSize(new Dimension(800, 400));
     }
 
-    /** استخدم لـ RR و non-RR على حد سواء */
-    public void setTimeline(List<RoundRobin.ExecutionSegment> segs) {
-        this.segments = new ArrayList<>(segs);
-        repaint();
-    }
-
-    /** إذا أردنا توليد الشارت من finishedQueue */
-    public void setTimelineFromFinished(Queue<Process> finished) {
-        List<RoundRobin.ExecutionSegment> segs = new ArrayList<>();
-        for (Process p : finished) {
-            segs.add(new RoundRobin.ExecutionSegment(
-                    p.getProcessNumber(), p.getStartTime(), p.getEndTime()));
-        }
-        this.segments = segs;
-        repaint();
+    public void setTimeline(List<ExecutionSegment> timeline) {
+        this.timeline = new ArrayList<>(timeline);
     }
 
     public void clear() {
-        if (segments != null) segments.clear();
+        this.timeline.clear();
         repaint();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        if (segments == null || segments.isEmpty()) return;
-
-        g.setFont(g.getFont().deriveFont(12f));
-        int y = 30;
-
-        // نحسب العرض النسبي لكل وحدة زمنية
-        int totalTime = segments.get(segments.size()-1).end;
-        if (totalTime <= 0) return;
-        double unitWidth = getWidth() / (double) totalTime;
-
-        // نرسم كل قطعة
-        for (RoundRobin.ExecutionSegment seg : segments) {
-            int x = (int)(seg.start * unitWidth);
-            int w = (int)((seg.end - seg.start) * unitWidth);
-            g.setColor(Color.CYAN);
-            g.fillRect(x, y, w, 40);
-            g.setColor(Color.BLACK);
-            g.drawRect(x, y, w, 40);
-            g.drawString("P" + seg.pid, x + w/2 - 5, y + 25);
-            g.drawString(String.valueOf(seg.start), x, y + 60);
+        if (timeline.isEmpty()) {
+            g.drawString("No execution segments to display.", padding, padding);
+            return;
         }
 
-        // نرسم النهاية النهائية
-        RoundRobin.ExecutionSegment last = segments.get(segments.size()-1);
-        int endX = (int)(last.end * unitWidth);
-        endX = Math.min(endX, getWidth() - 20);
-        g.drawString(String.valueOf(last.end), endX, y + 60);
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setStroke(new BasicStroke(1.5f));
+
+        List<Integer> pids = timeline.stream()
+                .map(seg -> seg.pid)
+                .distinct()
+                .sorted()
+                .toList();
+        Map<Integer,Integer> pidToRow = new HashMap<>();
+        for (int i = 0; i < pids.size(); i++) pidToRow.put(pids.get(i), i);
+
+        int maxTime = timeline.stream().mapToInt(seg -> seg.end).max().orElse(0);
+        for (int t = 0; t <= maxTime; t++) {
+            int x = padding + t * timeUnitWidth;
+            g2.drawLine(x, padding - 5, x, padding + rowHeight * pids.size());
+            g2.drawString(String.valueOf(t), x - 3, padding - 10);
+        }
+
+        for (ExecutionSegment seg : timeline) {
+            int row = pidToRow.get(seg.pid);
+            int x   = padding + seg.start * timeUnitWidth;
+            int y   = padding + row * rowHeight;
+            int w   = (seg.end - seg.start) * timeUnitWidth;
+            int h   = rowHeight - 5;
+
+            g2.setColor(getColorForPid(seg.pid));
+            g2.fillRect(x, y, w, h);
+            g2.setColor(Color.BLACK);
+            g2.drawRect(x, y, w, h);
+            g2.drawString("P" + seg.pid, x + 5, y + h/2 + 5);
+        }
+
+        for (int pid : pids) {
+            int row = pidToRow.get(pid);
+            int y   = padding + row * rowHeight + rowHeight/2 + 5;
+            g2.drawString("P" + pid, 5, y);
+        }
+    }
+
+    private Color getColorForPid(int pid) {
+        switch (pid % 6) {
+            case 0: return new Color(0x8BC34A);
+            case 1: return new Color(0x03A9F4);
+            case 2: return new Color(0xFFC107);
+            case 3: return new Color(0xE91E63);
+            case 4: return new Color(0x9C27B0);
+            default:return new Color(0xFF5722);
+        }
+    }
+
+    public static class ExecutionSegment {
+        public final int pid, start, end;
+        public ExecutionSegment(int pid, int start, int end) {
+            this.pid   = pid;
+            this.start = start;
+            this.end   = end;
+        }
     }
 }

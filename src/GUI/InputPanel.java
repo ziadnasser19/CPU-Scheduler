@@ -1,11 +1,13 @@
 package GUI;
 
-import Models.ProcessManager;
 import Models.Process;
+import Models.ProcessManager;
 import Algorithms.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class InputPanel extends JPanel {
     private final ProcessManager manager;
@@ -24,19 +26,12 @@ public class InputPanel extends JPanel {
                       ResultPanel resultPanel,
                       GanttChartPanel ganttPanel,
                       AveragePanel averagePanel) {
-        this.manager       = manager;
-        this.readyPanel    = readyPanel;
-        this.resultPanel   = resultPanel;
-        this.ganttPanel    = ganttPanel;
-        this.averagePanel  = averagePanel;
+        this.manager      = manager;
+        this.readyPanel   = readyPanel;
+        this.resultPanel  = resultPanel;
+        this.ganttPanel   = ganttPanel;
+        this.averagePanel = averagePanel;
 
-        setBorder(BorderFactory.createTitledBorder("Input & Controls"));
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(3,6,3,6);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        // Labels
         pidLabel      = new JLabel("Process #: " + manager.nextPID());
         burstLabel    = new JLabel("Burst Time:");
         priorityLabel = new JLabel("Priority:");
@@ -44,87 +39,93 @@ public class InputPanel extends JPanel {
         algoLabel     = new JLabel("Algorithm:");
         quantumLabel  = new JLabel("Time Quantum (RR):");
 
-        // Fields
         burstField    = new JTextField(6);
         priorityField = new JTextField(4);
-        arrivalField  = new JTextField("0", 4);       // default 0
+        arrivalField  = new JTextField("0", 4);
         quantumField  = new JTextField(4);
 
-        // Algorithm selector
         algorithmBox = new JComboBox<>(new String[]{
                 "FCFS", "SJF Non-Preemptive", "SJF Preemptive",
                 "Priority Non-Preemptive", "Priority Preemptive", "Round Robin"
         });
 
-        // Buttons
         addButton      = new JButton("Add Process");
         startButton    = new JButton("Start Scheduling");
         clearAllButton = new JButton("Clear All");
 
-        // Row 0: PID
-        gbc.gridx=0; gbc.gridy=0;
-        add(pidLabel, gbc);
+        setBorder(BorderFactory.createTitledBorder("Input & Controls"));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(3,6,3,6);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        // Row 1: Burst, Priority, Arrival
-        gbc.gridy=1;
-        gbc.gridx=0; add(burstLabel, gbc);
-        gbc.gridx=1; add(burstField, gbc);
+        gbc.gridx=0; gbc.gridy=0; gbc.gridwidth=6; add(pidLabel, gbc);
+        gbc.gridy=1; gbc.gridwidth=1;
+        gbc.gridx=0; add(burstLabel,    gbc);
+        gbc.gridx=1; add(burstField,    gbc);
         gbc.gridx=2; add(priorityLabel, gbc);
         gbc.gridx=3; add(priorityField, gbc);
-        gbc.gridx=4; add(arrivalLabel, gbc);
-        gbc.gridx=5; add(arrivalField, gbc);
-
-        // Row 2: Algorithm, Quantum
+        gbc.gridx=4; add(arrivalLabel,  gbc);
+        gbc.gridx=5; add(arrivalField,  gbc);
         gbc.gridy=2;
-        gbc.gridx=0; add(algoLabel, gbc);
-        gbc.gridx=1; add(algorithmBox, gbc);
-        gbc.gridx=2; add(quantumLabel, gbc);
-        gbc.gridx=3; add(quantumField, gbc);
-
-        // Row 3: Buttons
+        gbc.gridx=0; add(algoLabel,     gbc);
+        gbc.gridx=1; add(algorithmBox,  gbc);
+        gbc.gridx=2; add(quantumLabel,  gbc);
+        gbc.gridx=3; add(quantumField,  gbc);
         gbc.gridy=3;
-        gbc.gridx=0; add(addButton, gbc);
-        gbc.gridx=1; add(startButton, gbc);
-        gbc.gridx=2; add(clearAllButton, gbc);
+        gbc.gridx=0; add(addButton,     gbc);
+        gbc.gridx=1; add(startButton,   gbc);
+        gbc.gridx=2; add(clearAllButton,gbc);
 
-        // Initial visibility
-        toggleQuantumVisibility();
-        toggleArrivalVisibility();
+        updateQuantumVisibility();
+        updateArrivalVisibility();
+        updatePriorityVisibility();
 
-        // Listeners
         algorithmBox.addActionListener(e -> {
-            toggleQuantumVisibility();
-            toggleArrivalVisibility();
+            updateQuantumVisibility();
+            updateArrivalVisibility();
+            updatePriorityVisibility();
             if (!arrivalField.isVisible()) arrivalField.setText("0");
+            if (!priorityField.isVisible()) priorityField.setText("0");
         });
         addButton.addActionListener(e -> onAdd());
         startButton.addActionListener(e -> onStart());
         clearAllButton.addActionListener(e -> onClearAll());
     }
 
-    private void toggleQuantumVisibility() {
-        boolean isRR = "Round Robin".equals(algorithmBox.getSelectedItem());
-        quantumLabel.setVisible(isRR);
-        quantumField.setVisible(isRR);
+    private void updateQuantumVisibility() {
+        boolean rr = "Round Robin".equals(algorithmBox.getSelectedItem());
+        quantumLabel.setVisible(rr);
+        quantumField.setVisible(rr);
     }
 
-    private void toggleArrivalVisibility() {
+    private void updateArrivalVisibility() {
         String algo = (String)algorithmBox.getSelectedItem();
-        boolean show = algo.equals("SJF Preemptive")
-                || algo.equals("Priority Preemptive")
-                || algo.equals("Round Robin");
+        boolean show = algo.equals("SJF Preemptive") || algo.equals("Priority Preemptive");
         arrivalLabel.setVisible(show);
         arrivalField.setVisible(show);
+    }
+
+    private void updatePriorityVisibility() {
+        String algo = (String)algorithmBox.getSelectedItem();
+        boolean show = algo.contains("Priority");
+        priorityLabel.setVisible(show);
+        priorityField.setVisible(show);
     }
 
     private void onAdd() {
         try {
             int burst   = Integer.parseInt(burstField.getText().trim());
-            int prio    = Integer.parseInt(priorityField.getText().trim());
-            int arrival = Integer.parseInt(arrivalField.getText().trim());
+            int prio    = priorityField.isVisible()
+                    ? Integer.parseInt(priorityField.getText().trim())
+                    : 0;
+            int arrival = arrivalField.isVisible()
+                    ? Integer.parseInt(arrivalField.getText().trim())
+                    : 0;
             manager.createProcess(burst, prio, arrival);
+            readyPanel.clear();
+            manager.getReadyQueue().forEach(readyPanel::addRow);
             pidLabel.setText("Process #: " + manager.nextPID());
-            refreshReadyQueue();
             burstField.setText("");
             priorityField.setText("");
             if (!arrivalField.isVisible()) arrivalField.setText("0");
@@ -135,45 +136,65 @@ public class InputPanel extends JPanel {
     }
 
     private void onStart() {
-        manager.resetFinished();  // clear only the finished list
+        manager.resetFinished();
         resultPanel.clear();
         ganttPanel.clear();
         averagePanel.clearAverages();
 
         SchedulingAlgorithm scheduler;
         String algo = (String)algorithmBox.getSelectedItem();
-        int quantum = 0;
-        switch (algo) {
-            case "Round Robin":
-                try { quantum = Integer.parseInt(quantumField.getText().trim()); }
-                catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this,
-                            "Enter valid quantum.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                scheduler = new RoundRobin(quantum, manager);
-                break;
-            case "FCFS":   scheduler = new FCFS(manager); break;
-            case "SJF Non-Preemptive": scheduler = new SJFNonPreemptive(manager); break;
-            case "SJF Preemptive":     scheduler = new SJFPreemptive(manager); break;
-            case "Priority Non-Preemptive": scheduler = new PriorityNonPreemptive(manager); break;
-            case "Priority Preemptive":     scheduler = new PriorityPreemptive(manager); break;
-            default: scheduler = new FCFS(manager);
+        try {
+            switch (algo) {
+                case "Round Robin":
+                    int q = Integer.parseInt(quantumField.getText().trim());
+                    scheduler = new RoundRobin(q, manager);
+                    break;
+                case "FCFS":
+                    scheduler = new FCFS(manager); break;
+                case "SJF Non-Preemptive":
+                    scheduler = new SJFNonPreemptive(manager); break;
+                case "SJF Preemptive":
+                    scheduler = new SJFPreemptive(manager); break;
+                case "Priority Non-Preemptive":
+                    scheduler = new PriorityNonPreemptive(manager); break;
+                case "Priority Preemptive":
+                    scheduler = new PriorityPreemptive(manager); break;
+                default:
+                    scheduler = new FCFS(manager);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Enter valid quantum.", "Input Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
 
         scheduler.schedule();
         manager.getFinishedQueue().forEach(resultPanel::addRow);
 
-        // draw Gantt
+        List<GanttChartPanel.ExecutionSegment> segments = manager.getFinishedQueue().stream()
+                .map(p -> new GanttChartPanel.ExecutionSegment(
+                        p.getProcessNumber(),
+                        p.getStartTime(),
+                        p.getEndTime()))
+                .collect(Collectors.toList());
+
         if (scheduler instanceof RoundRobin) {
-            ganttPanel.setTimeline(((RoundRobin) scheduler).timeline);
-        } else {
-            ganttPanel.setTimelineFromFinished(manager.getFinishedQueue());
+            segments = ((RoundRobin)scheduler).timeline.stream()
+                    .map(s -> new GanttChartPanel.ExecutionSegment(s.pid, s.start, s.end))
+                    .collect(Collectors.toList());
+        } else if (scheduler instanceof PriorityPreemptive) {
+            segments = ((PriorityPreemptive)scheduler).timeline.stream()
+                    .map(s -> new GanttChartPanel.ExecutionSegment(s.pid, s.start, s.end))
+                    .collect(Collectors.toList());
+        } else if (scheduler instanceof SJFPreemptive) {
+            segments = ((SJFPreemptive)scheduler).timeline.stream()
+                    .map(s -> new GanttChartPanel.ExecutionSegment(s.pid, s.start, s.end))
+                    .collect(Collectors.toList());
         }
+
+        ganttPanel.setTimeline(segments);
         ganttPanel.repaint();
 
-        // compute averages...
-        int total = manager.getFinishedQueue().size();
         double avgWait = manager.getFinishedQueue().stream()
                 .mapToInt(Process::getWaitingTime).average().orElse(0);
         double avgTurn = manager.getFinishedQueue().stream()
@@ -185,16 +206,11 @@ public class InputPanel extends JPanel {
 
     private void onClearAll() {
         manager.resetAll();
-        pidLabel.setText("Process #: " + manager.nextPID());
         readyPanel.clear();
         resultPanel.clear();
         ganttPanel.clear();
         averagePanel.clearAverages();
+        pidLabel.setText("Process #: " + manager.nextPID());
         arrivalField.setText("0");
-    }
-
-    private void refreshReadyQueue() {
-        readyPanel.clear();
-        manager.getReadyQueue().forEach(readyPanel::addRow);
     }
 }
