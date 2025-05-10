@@ -1,105 +1,126 @@
+# CPU Scheduling Simulator
 
-CPU Scheduling Simulator
-Overview
-The CPU Scheduling Simulator is a Java-based application designed to simulate various CPU scheduling algorithms. It provides a user-friendly graphical interface that allows users to add processes, select scheduling algorithms, and view results in a visual format, including Gantt charts. The simulator supports various scheduling algorithms to help users understand and compare how different scheduling strategies affect process management.
+## Overview
 
-Features
-Supported Scheduling Algorithms:
+The **CPU Scheduling Simulator** is a Java-based application designed to simulate various CPU scheduling algorithms. It offers a user-friendly graphical interface that allows users to add processes, select scheduling algorithms, and view results in visual formats such as Gantt charts. The simulator supports multiple scheduling algorithms to help users understand and compare different scheduling strategies.
 
-FCFS (First Come First Serve): A non-preemptive algorithm where processes are executed in the order they arrive.
+## Features
 
-SJF (Shortest Job First): Can be non-preemptive or preemptive. The shortest burst time process is scheduled first.
+### Supported Scheduling Algorithms
 
-Priority Scheduling: Can be non-preemptive or preemptive. Processes are scheduled based on priority values.
+* **First Come First Serve (FCFS):**
+  Non-preemptive; processes are executed in the order they arrive.
 
-Round Robin (RR): Preemptive algorithm where processes are given a fixed time slice (quantum) for execution.
+* **Shortest Job First (SJF):**
 
-Process Management:
+  * *Non-preemptive:* The shortest burst time process is scheduled first without interruption.
+  * *Preemptive:* (Shortest Remaining Time First) Allows interruption if a new process has a shorter burst time.
 
-Add processes with attributes such as Process ID, Burst Time, Priority, and Arrival Time.
+* **Priority Scheduling:**
 
-The option to clear the list of processes if needed.
+  * *Non-preemptive:* Processes are scheduled based on priority values without interruption.
+  * *Preemptive:* A higher priority process can interrupt the currently running process.
 
-Quantum Configuration (for RR):
+* **Round Robin (RR):**
+  Preemptive; each process is given a fixed time slice (quantum) for execution.
 
-Allow users to specify the quantum time for the Round Robin algorithm.
+### Process Management
 
-Results Visualization:
+* Add processes with attributes:
 
-Displays process execution results in a table.
+  * Process ID
+  * Burst Time
+  * Priority
+  * Arrival Time
+* Clear all processes with a single button.
 
-Generates Gantt charts to visualize the execution order of processes.
+### Quantum Configuration (for RR)
 
-Calculates and displays performance metrics, including:
+* Input and configure quantum time for the Round Robin algorithm.
 
-Average Waiting Time
+### Results Visualization
 
-Average Turnaround Time
+* Displays process execution results in a table.
+* Generates Gantt charts to visualize execution order.
+* Calculates and displays performance metrics:
 
-Average Response Time
+  * Average Waiting Time
+  * Average Turnaround Time
+  * Average Response Time
 
-Project Structure
-graphql
-Copy
-Edit
+## Project Structure
+
+```bash
 src/
 ├── cpuscheduler/
 │   ├── algorithms/
-│   │   ├── FCFS.java               # Implements the FCFS scheduling algorithm
-│   │   ├── SJFNonPreemptive.java   # Implements the non-preemptive SJF algorithm
-│   │   ├── SJFPreemptive.java      # Implements the preemptive SJF algorithm
-│   │   ├── RoundRobin.java         # Implements the Round Robin scheduling algorithm
-│   │   └── PriorityNonPreemptive.java # Implements the non-preemptive Priority algorithm
-│   ├── Process.java                # Represents a process with attributes like burst time, priority, and arrival time
-│   ├── SchedulerResult.java        # Encapsulates the results of a scheduling algorithm
-│   └── gui/                        # Contains GUI components
-How to Use
-Add Processes:
+│   │   ├── FCFS.java                   # Implements the FCFS scheduling algorithm
+│   │   ├── SJFNonPreemptive.java       # Implements the non-preemptive SJF algorithm
+│   │   ├── SJFPreemptive.java          # Implements the preemptive SJF algorithm
+│   │   ├── PriorityNonPreemptive.java  # Implements the non-preemptive Priority algorithm
+│   │   ├── PriorityPreemptive.java     # Implements the preemptive Priority algorithm
+│   │   └── RoundRobin.java             # Implements the Round Robin scheduling algorithm
+│   ├── Process.java                    # Represents a process with attributes like burst time, priority, and arrival time
+│   ├── ProcessManager.java             # Manages ready and finished processes
+│   └── gui/                            # Contains GUI components
+```
 
-Enter the details for each process, including Burst Time, Priority, and Arrival Time.
+## How to Use
 
-Click the Add Process button to add the process.
+### Add Processes
 
-Select Algorithm:
+1. Enter process details:
 
-Choose one of the available scheduling algorithms from the dropdown.
+   * Burst Time
+   * Priority
+   * Arrival Time
+2. Click the **"Add Process"** button to add the process to the list.
 
-For Round Robin, enter the Time Quantum value.
+### Select Algorithm
 
-Run Scheduler:
+1. Choose one of the available scheduling algorithms from the dropdown.
+2. For **Round Robin**, input the Quantum Time value.
 
-Click the Start Scheduling button to run the selected algorithm.
+### Run Scheduler
 
-Results, including a Gantt chart and performance metrics, will be displayed.
+1. Click the **"Start Scheduling"** button to run the selected algorithm.
+2. View results, including the Gantt chart and performance metrics.
 
-Clear Processes:
+### Clear Processes
 
-Reset the process list and input fields using the Clear All button.
+* Reset the process list and input fields using the **"Clear All"** button.
 
-Requirements
-JDK: Version 8 or higher.
+## Requirements
 
-IDE: IntelliJ IDEA (recommended) or any Java-compatible IDE.
+* **Java Development Kit (JDK):** Version 8 or higher.
+* **IDE:** IntelliJ IDEA (recommended) or any Java-compatible IDE.
 
-Installation
-Clone the repository:
+## Installation
 
-bash
-Copy
-Edit
+```bash
 git clone https://github.com/your-username/cpu-scheduling-simulator.git
-Open the project in your preferred IDE (IntelliJ IDEA recommended).
+```
 
-Build and run the project.
+1. Open the project in your preferred IDE (IntelliJ IDEA recommended).
+2. Build and run the project.
 
-Example Output
-Gantt Chart: Displays the order of process execution.
+## Example Output
 
-Results Table: Shows process attributes along with computed performance metrics:
+* **Gantt Chart:**
+  Displays the order of process execution visually.
 
-Waiting Time
+* **Results Table:**
+  Shows each process's attributes and calculated metrics:
 
-Turnaround Time
+  * Waiting Time
+  * Turnaround Time
+  * Response Time
 
-Response Time
+## Contributing
 
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix.
+3. Commit your changes and push them to your fork.
+4. Submit a pull request.
