@@ -10,6 +10,7 @@ public class ProcessManager {
     // الآن نستقبل arrivalTime أيضاً
     public void createProcess(int burstTime, int priority, int arrivalTime) {
         Process p = new Process(nextPID++, burstTime, priority, arrivalTime);
+        p.setState(Process.ProcessState.READY);
         readyQueue.add(p);
     }
 
@@ -26,11 +27,18 @@ public class ProcessManager {
     }
 
     public void addFinishedProcess(Process p) {
+        p.setState(Process.ProcessState.TERMINATED);
         finishedQueue.add(p);
     }
 
     public void removeProcess(Process p) {
         readyQueue.remove(p);
+        p.setState(Process.ProcessState.WAITING);
+    }
+
+
+    public Process getNextReady() {
+        return readyQueue.peek();
     }
 
     public void resetFinished() {

@@ -43,7 +43,9 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
             }
 
             while (i < processes.size() && processes.get(i).getArrivalTime() <= currentTime) {
-                pq.add(processes.get(i));
+                Process p = processes.get(i);
+                p.setState(Process.ProcessState.READY);
+                pq.add(p);
                 i++;
             }
 
@@ -53,6 +55,7 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
             }
 
             Process p = pq.poll();
+            p.setState(Process.ProcessState.RUNNING);
             if (p.getRemainingTime() == p.getBurstTime()) {
                 p.setStartTime(currentTime);
                 p.setResponseTime(currentTime - p.getArrivalTime());
@@ -70,6 +73,7 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
                 manager.addFinishedProcess(p);
                 finished++;
             } else {
+                p.setState(Process.ProcessState.READY);
                 pq.add(p);
             }
         }

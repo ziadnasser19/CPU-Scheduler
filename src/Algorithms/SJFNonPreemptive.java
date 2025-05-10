@@ -23,6 +23,7 @@ public class SJFNonPreemptive implements SchedulingAlgorithm {
 
         int currentTime = 0;
         for (Process p : processes) {
+            p.setState(Process.ProcessState.RUNNING);
             p.setStartTime(currentTime);
             currentTime += p.getBurstTime();
             p.setEndTime(currentTime);

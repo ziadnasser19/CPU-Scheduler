@@ -1,34 +1,34 @@
 package Algorithms;
 
-import java.util.*;
-
 import Models.Process;
 import Models.ProcessManager;
+import java.util.ArrayList;
+import java.util.List;
 
+public class FCFS implements SchedulingAlgorithm {
+    private final ProcessManager manager;
 
-public class FCFS implements SchedulingAlgorithm{
-    ProcessManager processManager;
-
-    public FCFS(ProcessManager processManager) {
-        this.processManager = processManager;
+    public FCFS(ProcessManager manager) {
+        this.manager = manager;
     }
 
+    @Override
     public void schedule() {
-        List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
-
+        List<Process> processes = new ArrayList<>(manager.getReadyQueue());
         int currentTime = 0;
 
+        manager.resetFinished();
 
-        for (Process process : processes) {
-            process.setStartTime(currentTime);
-            currentTime += process.getBurstTime();
-            process.setEndTime(currentTime);
-            process.setTurnAroundTime(process.getEndTime() - process.getArrivalTime());
-            process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
-            process.setResponseTime(process.getStartTime() - process.getArrivalTime());
-            process.setRemainingTime(0);
-            processManager.removeProcess(process);
-            processManager.addFinishedProcess(process);
+        for (Process p : processes) {
+            p.setStartTime(currentTime);
+            currentTime += p.getBurstTime();
+            p.setEndTime(currentTime);
+
+            p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
+            p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+            p.setResponseTime(p.getStartTime() - p.getArrivalTime());
+
+            manager.addFinishedProcess(p);
         }
     }
 }

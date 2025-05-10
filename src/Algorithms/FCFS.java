@@ -20,6 +20,7 @@ public class FCFS implements SchedulingAlgorithm {
         manager.resetFinished();
 
         for (Process p : processes) {
+            p.setState(Process.ProcessState.RUNNING);
             p.setStartTime(currentTime);
             currentTime += p.getBurstTime();
             p.setEndTime(currentTime);

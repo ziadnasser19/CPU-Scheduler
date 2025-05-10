@@ -1,8 +1,9 @@
 package Models;
 
 public class Process {
+    public enum ProcessState {NEW, READY, RUNNING, WAITING, TERMINATED}
 
-    private static int PID = 1;
+    private ProcessState state;
     private int processNumber;
     private final int burstTime;
     private int remainingTime;
@@ -21,6 +22,7 @@ public class Process {
         this.priority = priority;
         this.arrivalTime = arrivalTime;
         this.remainingTime = burstTime;
+        this.state = ProcessState.NEW;
     }
 
     public int getProcessNumber() {

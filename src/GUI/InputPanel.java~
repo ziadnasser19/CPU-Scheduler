@@ -242,5 +242,6 @@ public class InputPanel extends JPanel {
         averagePanel.clearAverages();
         pidLabel.setText("Process #" + manager.nextPID());
         arrivalField.setText("0");
+        priorityField.setText("0");
     }
 }

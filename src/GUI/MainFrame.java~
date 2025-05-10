@@ -12,6 +12,7 @@ public class MainFrame extends JFrame {
     private final ResultPanel resultPanel;
     private final GanttChartPanel ganttPanel;
     private final AveragePanel averagePanel;
+    
 
     public MainFrame() {
         super("CPU Scheduling Simulator");
@@ -22,7 +23,7 @@ public class MainFrame extends JFrame {
         processManager = new ProcessManager();
 
         readyPanel = new ReadyQueuePanel();
-        resultPanel = new ResultPanel(); 
+        resultPanel = new ResultPanel();
         ganttPanel = new GanttChartPanel();
         averagePanel = new AveragePanel();
         inputPanel = new InputPanel(processManager, readyPanel, resultPanel, ganttPanel, averagePanel);

@@ -38,7 +38,6 @@ public class RoundRobin implements SchedulingAlgorithm {
             currentTime += exec;
 
             if (p.getRemainingTime() > 0) {
-                p.setState(Process.ProcessState.READY);
                 rq.add(p);
             } else {
                 p.setEndTime(currentTime);
