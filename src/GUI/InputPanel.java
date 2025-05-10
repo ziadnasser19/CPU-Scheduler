@@ -16,8 +16,8 @@ public class InputPanel extends JPanel {
     private final GanttChartPanel ganttPanel;
     private final AveragePanel averagePanel;
 
-    private final JLabel pidLabel, burstLabel, priorityLabel, arrivalLabel, algoLabel, quantumLabel;
-    private final JTextField burstField, priorityField, arrivalField, quantumField;
+    private final JLabel pidLabel, burstLabel, priorityLabel, arrivalLabel, algoLabel;
+    private final JTextField burstField, priorityField, arrivalField;
     private final JComboBox<String> algorithmBox;
     private final JButton addButton, startButton, clearAllButton;
 
@@ -37,12 +37,10 @@ public class InputPanel extends JPanel {
         priorityLabel = new JLabel("Priority:");
         arrivalLabel  = new JLabel("Arrival Time:");
         algoLabel     = new JLabel("Algorithm:");
-        quantumLabel  = new JLabel("Time Quantum (RR):");
 
         burstField    = new JTextField(6);
         priorityField = new JTextField("0", 4);
         arrivalField  = new JTextField("0", 4);
-        quantumField  = new JTextField(4);
 
         algorithmBox = new JComboBox<>(new String[]{
                 "FCFS", "SJF Non-Preemptive", "SJF Preemptive",
@@ -70,19 +68,15 @@ public class InputPanel extends JPanel {
         gbc.gridy=2;
         gbc.gridx=0; add(algoLabel,     gbc);
         gbc.gridx=1; add(algorithmBox,  gbc);
-        gbc.gridx=2; add(quantumLabel,  gbc);
-        gbc.gridx=3; add(quantumField,  gbc);
         gbc.gridy=3;
         gbc.gridx=0; add(addButton,     gbc);
         gbc.gridx=1; add(startButton,   gbc);
         gbc.gridx=2; add(clearAllButton,gbc);
 
-        updateQuantumVisibility();
         updateArrivalVisibility();
         updatePriorityVisibility();
 
         algorithmBox.addActionListener(e -> {
-            updateQuantumVisibility();
             updateArrivalVisibility();
             updatePriorityVisibility();
             if (!arrivalField.isVisible()) arrivalField.setText("0");
@@ -93,11 +87,6 @@ public class InputPanel extends JPanel {
         clearAllButton.addActionListener(e -> onClearAll());
     }
 
-    private void updateQuantumVisibility() {
-        boolean rr = "Round Robin".equals(algorithmBox.getSelectedItem());
-        quantumLabel.setVisible(rr);
-        quantumField.setVisible(rr);
-    }
 
     private void updateArrivalVisibility() {
         String algo = (String)algorithmBox.getSelectedItem();
