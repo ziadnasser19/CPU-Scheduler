@@ -2,6 +2,7 @@ package Models;
 
 public class Process {
 
+    private static int PID = 1;
     private int processNumber;
     private final int burstTime;
     private int remainingTime;

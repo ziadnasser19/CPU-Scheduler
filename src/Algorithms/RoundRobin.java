@@ -1,5 +1,6 @@
 package Algorithms;
 
+import GUI.ExecutionSegment;
 import Models.Process;
 import Models.ProcessManager;
 
@@ -43,13 +44,6 @@ public class RoundRobin implements SchedulingAlgorithm {
                 p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
                 manager.addFinishedProcess(p);
             }
-        }
-    }
-
-    public static class ExecutionSegment {
-        public final int pid, start, end;
-        public ExecutionSegment(int pid, int start, int end) {
-            this.pid = pid; this.start = start; this.end = end;
         }
     }
 }

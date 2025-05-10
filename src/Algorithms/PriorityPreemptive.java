@@ -1,5 +1,6 @@
 package Algorithms;
 
+import GUI.ExecutionSegment;
 import Models.Process;
 import Models.ProcessManager;
 
@@ -26,9 +27,21 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
         timeline.clear();
 
         PriorityQueue<Process> pq = new PriorityQueue<>(Comparator.comparingInt(Process::getPriority));
+        int maxArrival = processes.stream()
+                .mapToInt(Process::getArrivalTime).max().orElse(0);
+        int totalBurst = processes.stream()
+                .mapToInt(Process::getBurstTime).sum();
+        int timeLimit  = maxArrival + totalBurst;
+
         int currentTime = 0, i = 0, total = processes.size(), finished = 0;
 
         while (finished < total) {
+            // إذا تعدينا الحد المنطقي اقطع اللوب
+            if (currentTime > timeLimit) {
+                System.err.println("Warning: time exceeded limit, breaking loop.");
+                break;
+            }
+
             while (i < processes.size() && processes.get(i).getArrivalTime() <= currentTime) {
                 pq.add(processes.get(i));
                 i++;
@@ -59,15 +72,6 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
             } else {
                 pq.add(p);
             }
-        }
-    }
-
-    public static class ExecutionSegment {
-        public final int pid, start, end;
-        public ExecutionSegment(int pid, int start, int end) {
-            this.pid = pid;
-            this.start = start;
-            this.end = end;
         }
     }
 }

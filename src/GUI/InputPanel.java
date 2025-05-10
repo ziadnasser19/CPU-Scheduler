@@ -32,7 +32,7 @@ public class InputPanel extends JPanel {
         this.ganttPanel   = ganttPanel;
         this.averagePanel = averagePanel;
 
-        pidLabel      = new JLabel("Process #: " + manager.nextPID());
+        pidLabel      = new JLabel("Process #" + manager.nextPID());
         burstLabel    = new JLabel("Burst Time:");
         priorityLabel = new JLabel("Priority:");
         arrivalLabel  = new JLabel("Arrival Time:");
@@ -40,7 +40,7 @@ public class InputPanel extends JPanel {
         quantumLabel  = new JLabel("Time Quantum (RR):");
 
         burstField    = new JTextField(6);
-        priorityField = new JTextField(4);
+        priorityField = new JTextField("0", 4);
         arrivalField  = new JTextField("0", 4);
         quantumField  = new JTextField(4);
 
@@ -122,10 +122,18 @@ public class InputPanel extends JPanel {
             int arrival = arrivalField.isVisible()
                     ? Integer.parseInt(arrivalField.getText().trim())
                     : 0;
+
+            if (burst <= 0) {
+                throw new NumberFormatException("Burst time must be greater than 0.");
+            }
+            if(prio < 0 || arrival < 0) {
+                throw new NumberFormatException("Negative values are not allowed.");
+            }
+
             manager.createProcess(burst, prio, arrival);
             readyPanel.clear();
             manager.getReadyQueue().forEach(readyPanel::addRow);
-            pidLabel.setText("Process #: " + manager.nextPID());
+            pidLabel.setText("Process #" + manager.nextPID());
             burstField.setText("");
             priorityField.setText("");
             if (!arrivalField.isVisible()) arrivalField.setText("0");
@@ -146,7 +154,29 @@ public class InputPanel extends JPanel {
         try {
             switch (algo) {
                 case "Round Robin":
-                    int q = Integer.parseInt(quantumField.getText().trim());
+                    String input = JOptionPane.showInputDialog(
+                            this,
+                            "Enter Time Quantum:",
+                            "Round Robin Quantum",
+                            JOptionPane.QUESTION_MESSAGE
+                    );
+                    if (input == null) {
+                        // المستخدم ألغى الإدخال → لا تشغل الخوارزمية
+                        return;
+                    }
+                    int q;
+                    try {
+                        q = Integer.parseInt(input.trim());
+                        if (q <= 0) throw new NumberFormatException();
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(
+                                this,
+                                "Please enter a valid quantum (>0).",
+                                "Input Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                        return;
+                    }
                     scheduler = new RoundRobin(q, manager);
                     break;
                 case "FCFS":
@@ -210,7 +240,8 @@ public class InputPanel extends JPanel {
         resultPanel.clear();
         ganttPanel.clear();
         averagePanel.clearAverages();
-        pidLabel.setText("Process #: " + manager.nextPID());
+        pidLabel.setText("Process #" + manager.nextPID());
         arrivalField.setText("0");
+        priorityField.setText("0");
     }
 }
