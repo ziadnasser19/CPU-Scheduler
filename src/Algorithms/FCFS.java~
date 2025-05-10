@@ -6,10 +6,10 @@ import Models.Process;
 import Models.ProcessManager;
 
 
-public class FCFSAlgorithm implements SchedulingAlgorithm{
+public class FCFS implements SchedulingAlgorithm{
     ProcessManager processManager;
 
-    public FCFSAlgorithm(ProcessManager processManager) {
+    public FCFS(ProcessManager processManager) {
         this.processManager = processManager;
     }
 

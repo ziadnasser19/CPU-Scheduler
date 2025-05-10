@@ -1,0 +1,35 @@
+package GUI;
+
+import Models.Process;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+
+public class ResultPanel extends JPanel {
+    private final DefaultTableModel model = new DefaultTableModel(
+            new Object[]{"PID","Arrival","Start","End","Wait","Turnaround","Response"}, 0);
+
+    public ResultPanel() {
+        setBorder(BorderFactory.createTitledBorder("Results"));
+        setLayout(new BorderLayout());
+        JTable table = new JTable(model);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+    }
+
+    public void addRow(Process p) {
+        model.addRow(new Object[]{
+                p.getProcessNumber(),
+                p.getArrivalTime(),
+                p.getStartTime(),
+                p.getEndTime(),
+                p.getWaitingTime(),
+                p.getTurnAroundTime(),
+                p.getResponseTime()
+        });
+    }
+
+    public void clear() {
+        model.setRowCount(0);
+    }
+}

@@ -5,40 +5,51 @@ import Models.ProcessManager;
 
 import java.util.*;
 
-public class RoundRobin implements SchedulingAlgorithm{
-    int timeQuantum;
-    ProcessManager processManager;
+public class RoundRobin implements SchedulingAlgorithm {
+    private final int timeQuantum;
+    private final ProcessManager manager;
+    public final List<ExecutionSegment> timeline = new ArrayList<>();
 
-    public RoundRobin(int timeQuantum, ProcessManager processManager) {
+    public RoundRobin(int timeQuantum, ProcessManager manager) {
         this.timeQuantum = timeQuantum;
-        this.processManager = processManager;
+        this.manager = manager;
     }
 
+    @Override
     public void schedule() {
-        Queue<Process> readyQueue = new LinkedList<>(processManager.getReadyQueue());
+        // نسخة محلية لاستهلاك
+        Queue<Process> rq = new LinkedList<>(manager.getReadyQueue());
         int currentTime = 0;
+        timeline.clear();
+        manager.resetFinished();
 
-        while (!readyQueue.isEmpty()) {
-            Process process = readyQueue.poll();
-
-            if (process.getRemainingTime() == process.getBurstTime()) {
-                process.setStartTime(currentTime);
-                process.setResponseTime(currentTime - process.getArrivalTime());
+        while (!rq.isEmpty()) {
+            Process p = rq.poll();
+            if (p.getRemainingTime() == p.getBurstTime()) {
+                p.setStartTime(currentTime);
+                p.setResponseTime(currentTime - p.getArrivalTime());
             }
 
-            int timeSpent = Math.min(timeQuantum, process.getRemainingTime());
-            process.setRemainingTime(process.getRemainingTime() - timeSpent);
-            currentTime += timeSpent;
+            int exec = Math.min(timeQuantum, p.getRemainingTime());
+            timeline.add(new ExecutionSegment(p.getProcessNumber(), currentTime, currentTime + exec));
+            p.setRemainingTime(p.getRemainingTime() - exec);
+            currentTime += exec;
 
-            if (process.getRemainingTime() == 0) {
-                process.setEndTime(currentTime);
-                process.setTurnAroundTime(currentTime - process.getArrivalTime());
-                process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
-                processManager.removeProcess(process);
-                processManager.addFinishedProcess(process);
+            if (p.getRemainingTime() > 0) {
+                rq.add(p);
             } else {
-                readyQueue.add(process);
+                p.setEndTime(currentTime);
+                p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
+                p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+                manager.addFinishedProcess(p);
             }
+        }
+    }
+
+    public static class ExecutionSegment {
+        public final int pid, start, end;
+        public ExecutionSegment(int pid, int start, int end) {
+            this.pid = pid; this.start = start; this.end = end;
         }
     }
 }

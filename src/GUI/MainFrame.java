@@ -1,0 +1,46 @@
+package GUI;
+
+import Models.ProcessManager;
+import Algorithms.*;
+import javax.swing.*;
+import java.awt.*;
+
+public class MainFrame extends JFrame {
+    private final ProcessManager processManager;
+    private final InputPanel inputPanel;
+    private final ReadyQueuePanel readyPanel;
+    private final ResultPanel resultPanel;
+    private final GanttChartPanel ganttPanel;
+    private final AveragePanel averagePanel;
+
+    public MainFrame() {
+        super("CPU Scheduling Simulator");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setSize(1100, 850);
+        setLayout(new BorderLayout(10, 10));
+
+        processManager = new ProcessManager();
+
+        readyPanel = new ReadyQueuePanel();
+        resultPanel = new ResultPanel();
+        ganttPanel = new GanttChartPanel();
+        averagePanel = new AveragePanel();
+        inputPanel = new InputPanel(processManager, readyPanel, resultPanel, ganttPanel, averagePanel);
+
+        JSplitPane centerSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, readyPanel, resultPanel);
+        centerSplit.setResizeWeight(0.4);
+
+        add(inputPanel, BorderLayout.NORTH);
+        add(centerSplit, BorderLayout.CENTER);
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(ganttPanel, BorderLayout.CENTER);
+        southPanel.add(averagePanel, BorderLayout.EAST);
+        add(southPanel, BorderLayout.SOUTH);
+
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(MainFrame::new);
+    }
+}

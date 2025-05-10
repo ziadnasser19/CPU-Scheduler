@@ -3,49 +3,43 @@ package Models;
 import java.util.*;
 
 public class ProcessManager {
+    private int nextPID = 1;
+    private final Queue<Process> readyQueue = new LinkedList<>();
+    private final Queue<Process> finishedQueue = new LinkedList<>();
 
-    private static int nextPID = 1;
-    private Queue<Process> readyQueue;
-
-    private Queue<Process> finishedQueue;
-
-    public ProcessManager() {
-        readyQueue = new LinkedList<>();
-        finishedQueue = new LinkedList<>();
+    // الآن نستقبل arrivalTime أيضاً
+    public void createProcess(int burstTime, int priority, int arrivalTime) {
+        Process p = new Process(nextPID++, burstTime, priority, arrivalTime);
+        readyQueue.add(p);
     }
 
-
-
-
-    public void addProcess(Process process) {
-        readyQueue.add(process);
-    }
-
-
-
-    public void createProcess(int burstTime, int priority) {
-        Process p = new Process(nextPID++, burstTime, priority, 0);
-        addProcess(p);
+    public int nextPID() {
+        return nextPID;
     }
 
     public Queue<Process> getReadyQueue() {
         return readyQueue;
     }
 
-    public void removeProcess(Process process) {
-        if (getReadyQueue().contains(process)) {
-            this.readyQueue.remove(process);
-        }
-    }
-
-    public boolean isReadyQueueEmpty() {
-        return readyQueue.isEmpty();
-    }
-
-    public void addFinishedProcess(Process process) {
-        finishedQueue.add(process);
-    }
     public Queue<Process> getFinishedQueue() {
         return finishedQueue;
+    }
+
+    public void addFinishedProcess(Process p) {
+        finishedQueue.add(p);
+    }
+
+    public void removeProcess(Process p) {
+        readyQueue.remove(p);
+    }
+
+    public void resetFinished() {
+        finishedQueue.clear();
+    }
+
+    public void resetAll() {
+        readyQueue.clear();
+        finishedQueue.clear();
+        nextPID = 1;
     }
 }

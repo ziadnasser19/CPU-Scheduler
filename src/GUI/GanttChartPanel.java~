@@ -1,0 +1,86 @@
+package GUI;
+
+import Algorithms.RoundRobin;
+import Models.Process;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+
+public class GanttChartPanel extends JPanel {
+    private List<RoundRobin.ExecutionSegment> segments;
+    private Queue<Process> finishedForNonRR;
+
+    public GanttChartPanel() {
+        setBorder(BorderFactory.createTitledBorder("Gantt Chart"));
+        setPreferredSize(new Dimension(1100, 220));
+    }
+
+    public void setTimeline(List<RoundRobin.ExecutionSegment> segs) {
+        this.segments = new ArrayList<>(segs);
+        this.finishedForNonRR = null;
+        repaint();
+    }
+
+    public void setByFinished(Queue<Process> finished) {
+        this.finishedForNonRR = finished;
+        this.segments = null;
+        repaint();
+    }
+
+    public void clear() {
+        if (segments != null)        segments.clear();
+        if (finishedForNonRR != null) finishedForNonRR.clear();
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setFont(g.getFont().deriveFont(12f));
+        int y = 30;
+
+        if (segments != null) {
+            if (segments.isEmpty()) return;
+            int totalTime = segments.get(segments.size()-1).end;
+            if (totalTime <= 0) return;
+            double unitWidth = getWidth() / (double) totalTime;
+
+            for (RoundRobin.ExecutionSegment seg : segments) {
+                int x = (int) Math.round(seg.start * unitWidth);
+                int w = (int) Math.round((seg.end - seg.start) * unitWidth);
+                g.setColor(Color.CYAN);
+                g.fillRect(x, y, w, 40);
+                g.setColor(Color.BLACK);
+                g.drawRect(x, y, w, 40);
+                g.drawString("P" + seg.pid, x + w/2 - 5, y + 25);
+                g.drawString(String.valueOf(seg.start), x, y + 60);
+            }
+            RoundRobin.ExecutionSegment last = segments.get(segments.size()-1);
+            int endX = (int) Math.round(last.end * unitWidth);
+            endX = Math.min(endX, getWidth() - 20);
+            g.drawString(String.valueOf(last.end), endX, y + 60);
+
+        } else if (finishedForNonRR != null) {
+            int n = finishedForNonRR.size();
+            if (n == 0) return;
+            int w = getWidth() / n;
+            int x = 0;
+            List<Process> list = new ArrayList<>(finishedForNonRR);
+            for (Process p : list) {
+                g.setColor(Color.ORANGE);
+                g.fillRect(x, y, w, 40);
+                g.setColor(Color.BLACK);
+                g.drawRect(x, y, w, 40);
+                g.drawString("P" + p.getProcessNumber(), x + w/2 - 5, y + 25);
+                g.drawString(String.valueOf(p.getStartTime()), x, y + 60);
+                x += w;
+            }
+            Process last = list.get(list.size() - 1);
+            int endX = Math.min(x, getWidth() - 20);
+            g.drawString(String.valueOf(last.getEndTime()), endX, y + 60);
+        }
+    }
+}

@@ -16,7 +16,7 @@ public class SJFNonPreemptive implements SchedulingAlgorithm{
     public void schedule() {
         List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
 
-        processes.sort(Comparator.comparingInt(Process::getRemainingTime));
+        processes.sort(Comparator.comparingInt(Process::getBurstTime));
 
 
         int currentTime = 0;

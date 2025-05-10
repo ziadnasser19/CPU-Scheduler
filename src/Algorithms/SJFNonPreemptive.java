@@ -3,34 +3,35 @@ package Algorithms;
 import Models.Process;
 import Models.ProcessManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-public class SJFNonPreemptive implements SchedulingAlgorithm{
+public class SJFNonPreemptive implements SchedulingAlgorithm {
+    private final ProcessManager manager;
 
-    ProcessManager processManager;
-
-    public SJFNonPreemptive(ProcessManager processManager) {
-        this.processManager = processManager;
+    public SJFNonPreemptive(ProcessManager manager) {
+        this.manager = manager;
     }
 
+    @Override
     public void schedule() {
-        List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
-
+        List<Process> processes = new ArrayList<>(manager.getReadyQueue());
         processes.sort(Comparator.comparingInt(Process::getBurstTime));
 
+        manager.resetFinished();
 
         int currentTime = 0;
+        for (Process p : processes) {
+            p.setStartTime(currentTime);
+            currentTime += p.getBurstTime();
+            p.setEndTime(currentTime);
 
-        for (Process process : processes){
-            process.setStartTime(currentTime);
-            currentTime += process.getBurstTime();
-            process.setResponseTime(process.getStartTime() - process.getArrivalTime());
-            process.setRemainingTime(0);
-            process.setEndTime(currentTime);
-            process.setTurnAroundTime(process.getEndTime() - process.getArrivalTime());
-            process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
-            processManager.removeProcess(process);
-            processManager.addFinishedProcess(process);
+            p.setResponseTime(p.getStartTime() - p.getArrivalTime());
+            p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
+            p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+
+            manager.addFinishedProcess(p);
         }
     }
 }

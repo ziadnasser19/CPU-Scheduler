@@ -5,53 +5,53 @@ import Models.ProcessManager;
 
 import java.util.*;
 
-public class SJFPreemptive implements SchedulingAlgorithm{
+public class SJFPreemptive implements SchedulingAlgorithm {
+    private final ProcessManager manager;
 
-    ProcessManager processManager;
-
-    public SJFPreemptive(ProcessManager processManager) {
-        this.processManager = processManager;
+    public SJFPreemptive(ProcessManager manager) {
+        this.manager = manager;
     }
 
+    @Override
     public void schedule() {
-        List<Process> processes = new ArrayList<>(processManager.getReadyQueue());
-        Queue<Process> availableProcess = new PriorityQueue<>(Comparator.comparingInt(Process::getRemainingTime));
-        int currentTime = 0;
-        int i = 0;
-        int finishedCount = 0;
-        int total = processManager.getReadyQueue().size();
-        while (finishedCount < total) {
+        // نسخة محلية
+        List<Process> processes = new ArrayList<>(manager.getReadyQueue());
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
+
+        manager.resetFinished();
+
+        PriorityQueue<Process> pq = new PriorityQueue<>(Comparator.comparingInt(Process::getRemainingTime));
+        int currentTime = 0, i = 0, total = processes.size(), finished = 0;
+
+        while (finished < total) {
+            // أضف العمليات التي وصلت
             while (i < processes.size() && processes.get(i).getArrivalTime() <= currentTime) {
-                availableProcess.add(processes.get(i));
+                pq.add(processes.get(i));
                 i++;
             }
 
-            if (availableProcess.isEmpty()) {
+            if (pq.isEmpty()) {
                 currentTime++;
                 continue;
             }
 
-            Process process = availableProcess.poll();
-
-            if (process.getRemainingTime() == process.getBurstTime()) {
-                process.setStartTime(currentTime);
-                process.setResponseTime(process.getStartTime() - process.getArrivalTime());
+            Process p = pq.poll();
+            if (p.getRemainingTime() == p.getBurstTime()) {
+                p.setStartTime(currentTime);
+                p.setResponseTime(currentTime - p.getArrivalTime());
             }
 
-            process.setRemainingTime(process.getRemainingTime() - 1);
+            p.setRemainingTime(p.getRemainingTime() - 1);
             currentTime++;
 
-            if (process.getRemainingTime() == 0) {
-                process.setEndTime(currentTime);
-                process.setTurnAroundTime(process.getEndTime() - process.getArrivalTime());
-                process.setWaitingTime(process.getTurnAroundTime() - process.getBurstTime());
-
-                processManager.removeProcess(process);
-                processManager.addFinishedProcess(process);
-                finishedCount++;
-            }
-            else {
-                availableProcess.add(process);
+            if (p.getRemainingTime() == 0) {
+                p.setEndTime(currentTime);
+                p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
+                p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+                manager.addFinishedProcess(p);
+                finished++;
+            } else {
+                pq.add(p);
             }
         }
     }

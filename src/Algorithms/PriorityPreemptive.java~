@@ -5,11 +5,11 @@ import Models.ProcessManager;
 
 import java.util.*;
 
-public class PriorityPreemptiveAlgorithm implements SchedulingAlgorithm{
+public class PriorityPreemptive implements SchedulingAlgorithm{
 
     ProcessManager processManager;
 
-    public PriorityPreemptiveAlgorithm(ProcessManager processManager) {
+    public PriorityPreemptive(ProcessManager processManager) {
         this.processManager = processManager;
     }
 

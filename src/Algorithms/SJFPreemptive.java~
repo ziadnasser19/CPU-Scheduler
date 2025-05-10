@@ -5,11 +5,11 @@ import Models.ProcessManager;
 
 import java.util.*;
 
-public class ShortestJobFirstPreemptiveAlgorithm implements SchedulingAlgorithm{
+public class SJFPreemptive implements SchedulingAlgorithm{
 
     ProcessManager processManager;
 
-    public ShortestJobFirstPreemptiveAlgorithm(ProcessManager processManager) {
+    public SJFPreemptive(ProcessManager processManager) {
         this.processManager = processManager;
     }
 
