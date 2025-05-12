@@ -73,42 +73,46 @@ public class InputPanel extends JPanel {
         gbc.gridx=1; add(startButton,   gbc);
         gbc.gridx=2; add(clearAllButton,gbc);
 
-        updateArrivalVisibility();
-        updatePriorityVisibility();
+        // === تعديل: الحقول دايمًا مرئية لكن معطّلة مبدئيًا ===
+        priorityLabel.setEnabled(false);
+        priorityField.setEnabled(false);
+        arrivalLabel.setEnabled(false);
+        arrivalField.setEnabled(false);
 
         algorithmBox.addActionListener(e -> {
-            updateArrivalVisibility();
-            updatePriorityVisibility();
-            if (!arrivalField.isVisible()) arrivalField.setText("0");
-            if (!priorityField.isVisible()) priorityField.setText("0");
+            updateArrivalEnabled();
+            updatePriorityEnabled();
+            if (!arrivalField.isEnabled()) arrivalField.setText("0");
+            if (!priorityField.isEnabled()) priorityField.setText("0");
         });
         addButton.addActionListener(e -> onAdd());
         startButton.addActionListener(e -> onStart());
         clearAllButton.addActionListener(e -> onClearAll());
     }
 
-
-    private void updateArrivalVisibility() {
+    // === تعديل: تفعيل/تعطيل بدل إظهار/إخفاء ===
+    private void updateArrivalEnabled() {
         String algo = (String)algorithmBox.getSelectedItem();
-        boolean show = algo.equals("SJF Preemptive") || algo.equals("Priority Preemptive");
-        arrivalLabel.setVisible(show);
-        arrivalField.setVisible(show);
+        boolean enable = algo.equals("SJF Preemptive") || algo.equals("Priority Preemptive");
+        arrivalLabel.setEnabled(enable);
+        arrivalField.setEnabled(enable);
     }
 
-    private void updatePriorityVisibility() {
+    private void updatePriorityEnabled() {
         String algo = (String)algorithmBox.getSelectedItem();
-        boolean show = algo.contains("Priority");
-        priorityLabel.setVisible(show);
-        priorityField.setVisible(show);
+        boolean enable = algo.contains("Priority");
+        priorityLabel.setEnabled(enable);
+        priorityField.setEnabled(enable);
     }
 
+    // باقي الكود من onAdd(), onStart(), onClearAll() يبقى كما هو دون تغيير...
     private void onAdd() {
         try {
             int burst   = Integer.parseInt(burstField.getText().trim());
-            int prio    = priorityField.isVisible()
+            int prio    = priorityField.isEnabled()
                     ? Integer.parseInt(priorityField.getText().trim())
                     : 0;
-            int arrival = arrivalField.isVisible()
+            int arrival = arrivalField.isEnabled()
                     ? Integer.parseInt(arrivalField.getText().trim())
                     : 0;
 
@@ -125,7 +129,7 @@ public class InputPanel extends JPanel {
             pidLabel.setText("Process #" + manager.nextPID());
             burstField.setText("");
             priorityField.setText("");
-            if (!arrivalField.isVisible()) arrivalField.setText("0");
+            arrivalField.setText("0");
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
                     "Enter valid integers.", "Input Error", JOptionPane.ERROR_MESSAGE);
@@ -140,51 +144,24 @@ public class InputPanel extends JPanel {
 
         SchedulingAlgorithm scheduler;
         String algo = (String)algorithmBox.getSelectedItem();
-        try {
-            switch (algo) {
-                case "Round Robin":
-                    String input = JOptionPane.showInputDialog(
-                            this,
-                            "Enter Time Quantum:",
-                            "Round Robin Quantum",
-                            JOptionPane.QUESTION_MESSAGE
-                    );
-                    if (input == null) {
-                        // المستخدم ألغى الإدخال → لا تشغل الخوارزمية
-                        return;
-                    }
-                    int q;
-                    try {
-                        q = Integer.parseInt(input.trim());
-                        if (q <= 0) throw new NumberFormatException();
-                    } catch (NumberFormatException ex) {
-                        JOptionPane.showMessageDialog(
-                                this,
-                                "Please enter a valid quantum (>0).",
-                                "Input Error",
-                                JOptionPane.ERROR_MESSAGE
-                        );
-                        return;
-                    }
-                    scheduler = new RoundRobin(q, manager);
-                    break;
-                case "FCFS":
-                    scheduler = new FCFS(manager); break;
-                case "SJF Non-Preemptive":
-                    scheduler = new SJFNonPreemptive(manager); break;
-                case "SJF Preemptive":
-                    scheduler = new SJFPreemptive(manager); break;
-                case "Priority Non-Preemptive":
-                    scheduler = new PriorityNonPreemptive(manager); break;
-                case "Priority Preemptive":
-                    scheduler = new PriorityPreemptive(manager); break;
-                default:
-                    scheduler = new FCFS(manager);
-            }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Enter valid quantum.", "Input Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        switch (algo) {
+            case "Round Robin":
+                String input = JOptionPane.showInputDialog(
+                        this,
+                        "Enter Time Quantum:",
+                        "Round Robin Quantum",
+                        JOptionPane.QUESTION_MESSAGE
+                );
+                if (input == null) return;
+                int q = Integer.parseInt(input.trim());
+                scheduler = new RoundRobin(q, manager);
+                break;
+            case "FCFS":                      scheduler = new FCFS(manager); break;
+            case "SJF Non-Preemptive":       scheduler = new SJFNonPreemptive(manager); break;
+            case "SJF Preemptive":           scheduler = new SJFPreemptive(manager); break;
+            case "Priority Non-Preemptive":  scheduler = new PriorityNonPreemptive(manager); break;
+            case "Priority Preemptive":      scheduler = new PriorityPreemptive(manager); break;
+            default:                         scheduler = new FCFS(manager);
         }
 
         scheduler.schedule();
