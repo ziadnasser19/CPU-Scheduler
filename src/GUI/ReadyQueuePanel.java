@@ -7,7 +7,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
 public class ReadyQueuePanel extends JPanel {
-    // نموذج الجدول الآن يتضمن عمود Arrival
     private final DefaultTableModel model =
             new DefaultTableModel(new Object[]{"PID", "Burst", "Priority", "Arrival"}, 0);
 
@@ -23,7 +22,7 @@ public class ReadyQueuePanel extends JPanel {
                 p.getProcessNumber(),
                 p.getBurstTime(),
                 p.getPriority(),
-                p.getArrivalTime()   // عرض وقت الوصول
+                p.getArrivalTime()
         });
     }
 

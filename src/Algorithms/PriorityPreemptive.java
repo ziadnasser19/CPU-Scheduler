@@ -19,7 +19,6 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
 
     @Override
     public void schedule() {
-        // قائمة العمليات مرتبة حسب Arrival
         List<Process> processes = new ArrayList<>(manager.getReadyQueue());
         processes.sort(Comparator.comparingInt(Process::getArrivalTime));
 
@@ -36,7 +35,6 @@ public class PriorityPreemptive implements SchedulingAlgorithm {
         int currentTime = 0, i = 0, total = processes.size(), finished = 0;
 
         while (finished < total) {
-            // إذا تعدينا الحد المنطقي اقطع اللوب
             if (currentTime > timeLimit) {
                 System.err.println("Warning: time exceeded limit, breaking loop.");
                 break;

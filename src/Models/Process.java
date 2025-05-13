@@ -8,7 +8,7 @@ public class Process {
     private final int burstTime;
     private int remainingTime;
     private int priority;
-    private final int arrivalTime;
+    private int arrivalTime;
     private int waitingTime;
     private int turnAroundTime;
     private int responseTime;
@@ -30,6 +30,10 @@ public class Process {
 
     public void setState(ProcessState state) {
         this.state = state;
+    }
+
+    public void setArrivalTime(int arrivalTime) {
+        this.arrivalTime = arrivalTime;
     }
     public int getProcessNumber() {
         return processNumber;

@@ -18,7 +18,6 @@ public class RoundRobin implements SchedulingAlgorithm {
 
     @Override
     public void schedule() {
-        // نسخة محلية لاستهلاك
         Queue<Process> rq = new LinkedList<>(manager.getReadyQueue());
         int currentTime = 0;
         timeline.clear();
