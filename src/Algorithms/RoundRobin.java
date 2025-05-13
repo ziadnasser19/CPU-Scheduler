@@ -18,34 +18,46 @@ public class RoundRobin implements SchedulingAlgorithm {
 
     @Override
     public void schedule() {
-        // نسخة محلية لاستهلاك
-        Queue<Process> rq = new LinkedList<>(manager.getReadyQueue());
+        Queue<Process> readyQueue = new LinkedList<>(manager.getReadyQueue());
         int currentTime = 0;
         timeline.clear();
         manager.resetFinished();
 
-        while (!rq.isEmpty()) {
-            Process p = rq.poll();
+        while (!readyQueue.isEmpty()) {
+            Process p = readyQueue.poll();
             p.setState(Process.ProcessState.RUNNING);
+
             if (p.getRemainingTime() == p.getBurstTime()) {
                 p.setStartTime(currentTime);
                 p.setResponseTime(currentTime - p.getArrivalTime());
             }
 
-            int exec = Math.min(timeQuantum, p.getRemainingTime());
-            timeline.add(new ExecutionSegment(p.getProcessNumber(), currentTime, currentTime + exec));
-            p.setRemainingTime(p.getRemainingTime() - exec);
-            currentTime += exec;
-
-            if (p.getRemainingTime() > 0) {
+            if (p.getRemainingTime() > timeQuantum) {
+                p.setRemainingTime(p.getRemainingTime() - timeQuantum);
+                currentTime += timeQuantum;
                 p.setState(Process.ProcessState.READY);
-                rq.add(p);
-            } else {
+                readyQueue.add(p);
+
+                timeline.add(new ExecutionSegment(p.getProcessNumber(), currentTime - timeQuantum, currentTime));
+            }
+            else {
+                currentTime += p.getRemainingTime();
                 p.setEndTime(currentTime);
+
                 p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
                 p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
+
+                timeline.add(new ExecutionSegment(p.getProcessNumber(), currentTime - p.getRemainingTime(), currentTime));
+                p.setRemainingTime(0);
+
                 manager.addFinishedProcess(p);
             }
+
+            Queue<Process> finishedQueue = new LinkedList<>(manager.getFinishedQueue().stream()
+                    .sorted(Comparator.comparingInt(Process::getProcessNumber))
+                    .toList());
+
+            manager.setFinishedQueue(finishedQueue);
         }
     }
 }

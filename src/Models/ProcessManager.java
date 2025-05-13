@@ -5,7 +5,7 @@ import java.util.*;
 public class ProcessManager {
     private int nextPID = 1;
     private final Queue<Process> readyQueue = new LinkedList<>();
-    private final Queue<Process> finishedQueue = new LinkedList<>();
+    private Queue<Process> finishedQueue = new LinkedList<>();
 
     // الآن نستقبل arrivalTime أيضاً
     public void createProcess(int burstTime, int priority, int arrivalTime) {
@@ -39,6 +39,10 @@ public class ProcessManager {
 
     public Process getNextReady() {
         return readyQueue.peek();
+    }
+
+    public void setFinishedQueue(Queue<Process> finishedQueue) {
+        this.finishedQueue = finishedQueue;
     }
 
     public void resetFinished() {
