@@ -7,7 +7,6 @@ public class ProcessManager {
     private final Queue<Process> readyQueue = new LinkedList<>();
     private Queue<Process> finishedQueue = new LinkedList<>();
 
-    // الآن نستقبل arrivalTime أيضاً
     public void createProcess(int burstTime, int priority, int arrivalTime) {
         Process p = new Process(nextPID++, burstTime, priority, arrivalTime);
         p.setState(Process.ProcessState.READY);

@@ -3,6 +3,7 @@ package Algorithms;
 import Models.Process;
 import Models.ProcessManager;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class FCFS implements SchedulingAlgorithm {
@@ -15,6 +16,9 @@ public class FCFS implements SchedulingAlgorithm {
     @Override
     public void schedule() {
         List<Process> processes = new ArrayList<>(manager.getReadyQueue());
+
+        processes.sort(Comparator.comparingInt(Process::getArrivalTime));
+
         int currentTime = 0;
 
         manager.resetFinished();

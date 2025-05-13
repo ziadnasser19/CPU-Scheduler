@@ -73,7 +73,6 @@ public class InputPanel extends JPanel {
         gbc.gridx=1; add(startButton,   gbc);
         gbc.gridx=2; add(clearAllButton,gbc);
 
-        // === تعديل: الحقول دايمًا مرئية لكن معطّلة مبدئيًا ===
         priorityLabel.setEnabled(false);
         priorityField.setEnabled(false);
         arrivalLabel.setEnabled(false);
@@ -90,7 +89,6 @@ public class InputPanel extends JPanel {
         clearAllButton.addActionListener(e -> onClearAll());
     }
 
-    // === تعديل: تفعيل/تعطيل بدل إظهار/إخفاء ===
     private void updateArrivalEnabled() {
         String algo = (String)algorithmBox.getSelectedItem();
         boolean enable = algo.equals("SJF Preemptive") || algo.equals("Priority Preemptive");
@@ -105,7 +103,6 @@ public class InputPanel extends JPanel {
         priorityField.setEnabled(enable);
     }
 
-    // باقي الكود من onAdd(), onStart(), onClearAll() يبقى كما هو دون تغيير...
     private void onAdd() {
         try {
             int burst   = Integer.parseInt(burstField.getText().trim());
@@ -130,6 +127,7 @@ public class InputPanel extends JPanel {
             burstField.setText("");
             priorityField.setText("");
             arrivalField.setText("0");
+            priorityField.setText("0");
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this,
                     "Enter valid integers.", "Input Error", JOptionPane.ERROR_MESSAGE);

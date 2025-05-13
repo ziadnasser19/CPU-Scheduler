@@ -27,7 +27,7 @@ public class SJFNonPreemptive implements SchedulingAlgorithm {
             p.setStartTime(currentTime);
             currentTime += p.getBurstTime();
             p.setEndTime(currentTime);
-
+            p.setArrivalTime(0);
             p.setResponseTime(p.getStartTime() - p.getArrivalTime());
             p.setTurnAroundTime(p.getEndTime() - p.getArrivalTime());
             p.setWaitingTime(p.getTurnAroundTime() - p.getBurstTime());
